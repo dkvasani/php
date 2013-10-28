@@ -1,0 +1,9 @@
+  $queryEx = $this->getEntityManager()->createQueryBuilder()
+                        ->select('SUM(t.amount_paid) as amount,t.id,t.currency as payment_clearing_currency,t.iyzico_merchant_id,t.bank_processing_date,m.email,md.website')
+                        ->from($transactionLogTable, 't')
+                        ->Join('Merchant\Entity\Merchant', 'm', 'WITH', 't.iyzico_merchant_id = m.' . $iyzicoMerchantId)
+                        ->Join('Merchant\Entity\MerchantDetails', 'md', 'WITH', 'm.id = md.merchant_id')
+                        ->where("t.state = 1 AND t.currency = '" . $defaultCurrency . "' AND t.iyzico_merchant_id != '' AND STR_TO_DATE(t.bank_processing_date,'%d/%m/%Y') >= '" . $newfromDate . "' AND STR_TO_DATE(t.bank_processing_date,'%d/%m/%Y') <= '" . $newtoDate . "'")
+                        ->groupBy('t.iyzico_merchant_id')
+                        ->orderBy('amount', 'DESC')
+                        ->setMaxResults($setMaxRes);
